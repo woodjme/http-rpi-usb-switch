@@ -15,8 +15,7 @@ const server = http.createServer((req, res) => {
     });
 
     if (req.url === "/status" && req.method === "GET") {
-        const stdout = execSync("ls");
-        if (fs.existsSync("/sys/bus/usb/drivers/usb/1-1")) {
+        if (fs.existsSync("/tmp/usb_on")) {
             res.end("1");
         } else {
             res.end("0");
@@ -24,7 +23,7 @@ const server = http.createServer((req, res) => {
     } else if (req.url === "/state/on" && req.method === "POST") {
         try {
             execSync("uhubctl -l 2 -a 1");
-            execSync("echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/bind");
+            execSync("touch /tmp/usb_on");
             res.end("1");
         } catch (err) {
             console.error(err);
@@ -32,7 +31,7 @@ const server = http.createServer((req, res) => {
     } else if (req.url === "/state/off" && req.method === "POST") {
         try {
             execSync("uhubctl -l 2 -a 0");
-            execSync("echo '1-1' |sudo tee /sys/bus/usb/drivers/usb/unbind");
+            execSync("rm /tmp/usb_on");
             res.end("0");
         } catch (err) {
             console.error(err);
@@ -46,3 +45,4 @@ const server = http.createServer((req, res) => {
 server.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
+
