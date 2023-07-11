@@ -3,6 +3,7 @@ const fs = require("fs");
 const { execSync } = require("child_process");
 const port = 8080;
 const server = http.createServer((req, res) => {
+    execSync("touch /tmp/usb_on");
     req.on("error", (err) => {
         console.error(err);
         res.statusCode = 400;
